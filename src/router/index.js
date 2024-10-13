@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { userStore } from '@/stores/index'
 
 const router = createRouter({
   // 配置history模式： createWebHistory 不带井号 createHashHistory 带井号
@@ -22,7 +23,7 @@ const router = createRouter({
           path: '/article/manage',
           component: () => import('@/views/article/ArticleManage.vue')
         },
-        // 频道管理
+        // 文章分类
         {
           path: '/article/channel',
           component: () => import('@/views/article/ArticleChannel.vue')
@@ -45,6 +46,16 @@ const router = createRouter({
       ]
     }
   ]
+})
+
+// 当没有登录且访问路径是非登录注册网站时，自动跳转会login页面
+// 1. undefined / true  直接放行
+// 2. false 拦回from的地址页面
+router.beforeEach((to) => {
+  const user = userStore()
+  if (!user.token && to.path !== '/login') {
+    return '/login'
+  }
 })
 
 export default router
