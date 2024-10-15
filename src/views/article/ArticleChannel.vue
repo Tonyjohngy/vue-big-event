@@ -3,7 +3,7 @@ import { Edit, DeleteFilled } from '@element-plus/icons-vue'
 import { getChannelList, delChannel } from '@/api/article'
 import { onMounted, ref } from 'vue'
 import { ElMessageBox, ElMessage } from 'element-plus'
-import EditChannel from './component/EditChannel.vue'
+import EditChannel from '@/views/article/component/EditChannel.vue'
 // 定义获取数据分类的对象
 const channelList = ref([])
 // 设置楼层
