@@ -6,6 +6,8 @@ import { userRegisterService, userLoginService } from '@/api/user.js'
 import { ElMessage } from 'element-plus'
 import { userStore } from '@/stores/index'
 import { useRouter } from 'vue-router'
+import { onMounted } from 'vue'
+
 // 控制注册登录页面切换
 const isRegister = ref(false)
 // 设置token类
@@ -73,15 +75,32 @@ const login = async () => {
   const res = await userLoginService(ruleForm.value)
   userToken.setToken(res.data.token)
   ElMessage.success('登陆成功！')
+
+  // 如果用户选择了“记住我”，则将用户信息存储在 localStorage 中
+  const rememberMe = document.querySelector('.el-checkbox').checked
+  if (rememberMe) {
+    localStorage.setItem('user', JSON.stringify(ruleForm.value))
+  } else {
+    localStorage.removeItem('user')
+  }
+
   router.push('/')
 }
 
-// 监视器
+// 监视页面变化清空内容
 watch(isRegister, () => {
   ruleForm.value = {
     username: '',
     password: '',
     repassword: ''
+  }
+})
+// 获取localStorage中的user数据
+onMounted(() => {
+  const user = localStorage.getItem('user')
+  if (user) {
+    ruleForm.value = JSON.parse(user)
+    document.querySelector('.el-checkbox').checked = true
   }
 })
 </script>
