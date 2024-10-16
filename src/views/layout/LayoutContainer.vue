@@ -84,7 +84,7 @@ const onCommand = async (command) => {
         <el-header>
           <div>
             用户：<strong>{{
-              userSt.userInfo.username || userSt.userInfo.nickname
+              userSt.userInfo.nickname || userSt.userInfo.username
             }}</strong>
           </div>
           <el-dropdown placement="bottom-end">

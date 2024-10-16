@@ -30,15 +30,20 @@ const formModel = ref({
 })
 const rules = {
   title: [
-    { require: true, message: '请输入文章标题', trigger: blur },
+    { required: true, message: '请输入文章标题', trigger: 'blur' },
     {
       pattern: /^\S{1,10}$/,
       message: '标题名必须是1-10位的非空字符',
-      trigger: blur
+      trigger: 'blur'
     }
-  ]
+  ],
+  content: [{ required: true, message: '请输入文章内容', trigger: 'blur' }]
 }
-//暴露open方法实现组件
+
+// 表单引用
+const formRef = ref(null)
+
+// 暴露open方法实现组件
 const open = async (row) => {
   isDrawer.value = true
   if (row.id) {
@@ -51,7 +56,7 @@ const open = async (row) => {
       formModel.value.cover_img
     )
   } else {
-    formModel.value = { ...defaultForm }
+    formModel.value = { ...defaultForm.value }
     imgUrl.value = ''
     editorRef.value.setHTML('')
   }
@@ -81,40 +86,52 @@ async function imageUrlToFile(url, fileName) {
 
 // 成功后通知父类组件刷新
 const emit = defineEmits('success')
+
 // 上传图片
 const onUpdate = (updateFile) => {
   // 显示图片预览
   imgUrl.value = URL.createObjectURL(updateFile.raw)
   formModel.value.cover_img = updateFile.raw
 }
+
 // 提交文章
 const onPulish = async (state) => {
   formModel.value.state = state
-  // 提交接口需要FormData类型的数据
-  const fd = new FormData()
-  // 循环并逐一添加到FormData中
-  for (let i in formModel.value) {
-    fd.append(i, formModel.value[i])
-  }
 
-  if (formModel.value.id) {
-    artEditService(fd)
-    ElMessage({
-      type: 'success',
-      message: '文章修改成功'
-    })
-    isDrawer.value = false
-    emit('success', 'edit')
-  } else {
-    await addArticle(fd)
-    ElMessage({
-      type: 'success',
-      message: '文章添加成功'
-    })
-    isDrawer.value = false
-    emit('success', 'add')
-  }
+  // 验证表单
+  formRef.value.validate(async (valid) => {
+    if (valid) {
+      // 提交接口需要FormData类型的数据
+      const fd = new FormData()
+      // 循环并逐一添加到FormData中
+      for (let i in formModel.value) {
+        fd.append(i, formModel.value[i])
+      }
+
+      if (formModel.value.id) {
+        await artEditService(fd)
+        ElMessage({
+          type: 'success',
+          message: '文章修改成功'
+        })
+        isDrawer.value = false
+        emit('success', 'edit')
+      } else {
+        await addArticle(fd)
+        ElMessage({
+          type: 'success',
+          message: '文章添加成功'
+        })
+        isDrawer.value = false
+        emit('success', 'add')
+      }
+    } else {
+      ElMessage.error('请检查输入内容')
+      return false
+    }
+  })
 }
+
 defineExpose({
   open
 })
@@ -129,7 +146,7 @@ defineExpose({
     direction="rtl"
     size="50%"
   >
-    <el-form :model="formModel" :rules="rules" label-width="80px">
+    <el-form ref="formRef" :model="formModel" :rules="rules" label-width="80px">
       <el-form-item label="文章标题" prop="title">
         <el-input v-model="formModel.title" placeholder="请输入标题"></el-input>
       </el-form-item>
