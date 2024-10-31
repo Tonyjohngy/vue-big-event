@@ -1,3 +1,9 @@
-本项目的技术栈 
-本项目技术栈基于 ES6、vue3、pinia、vue-router 、vite 、axios 和 element-plus
+本项目技术栈基于 ES6、vue3、pinia、vue-router 、vite 、axios 和 element-plus，打造的后台管理系统，
 
+
+功能模块
+
+1、用户模块 用户注册与登录: 支持密码注册与登录。 
+个人信息管理: 用户可以查看和编辑个人信息，包括头像、密码、昵称等，
+
+2、文章管理和文章分类管理的增删改查
